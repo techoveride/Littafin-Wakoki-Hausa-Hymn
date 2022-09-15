@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:littafin_wakoki/model/webview.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:clipboard/clipboard.dart';
 
 // ignore: must_be_immutable
 class SupportUs extends StatelessWidget {
   var scaffoldKey = GlobalKey<ScaffoldState>();
-  var theme;
 
   @override
   Widget build(BuildContext context) {
-    theme = Theme.of(context).colorScheme;
+    var theme = Theme.of(context).colorScheme;
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
         title: const Text("Support Us",
             style: TextStyle(fontFamily: 'sans serif')),
-        actions: <Widget>[
-          const Padding(
+        actions: const <Widget>[
+          Padding(
             padding: EdgeInsets.all(8.0),
             child: Icon(Icons.people_outline),
           )
@@ -35,7 +32,7 @@ class SupportUs extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(4.0),
-                      color: theme.primaryVariant),
+                      color: theme.primaryContainer),
                   height: 46,
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
@@ -64,7 +61,7 @@ class SupportUs extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(4.0),
-                      color: theme.primaryVariant),
+                      color: theme.primaryContainer),
                   height: 46,
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
@@ -183,9 +180,9 @@ class SupportUs extends StatelessWidget {
   }
 
   _launchURL(String myUrl) async {
-    var url = myUrl;
-    if (await canLaunch(url)) {
-      await launch(url);
+    Uri url = Uri.parse(myUrl);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {
       throw 'Could not launch $url';
     }

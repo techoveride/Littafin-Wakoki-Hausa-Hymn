@@ -28,7 +28,7 @@ class DatabaseHelper {
   initDB() async {
     String document = await getDatabasesPath();
     String path = join(document, "Hymn_Lyrics.db");
-    var runDb = await openDatabase(path, version: 1, onCreate: _onCreate);
+    Database? runDb = await openDatabase(path, version: 1, onCreate: _onCreate);
     return runDb;
   }
 
@@ -45,26 +45,26 @@ class DatabaseHelper {
   }
 
   Future<int> saveHymns(ComposeHymns hymn) async {
-    var dbClient = await getDB;
+    Database? dbClient = await getDB;
     int res = -1;
     await dbClient?.transaction((txn) async {
-      res = await txn.insert("$hymnTable", hymn.toJson());
+      res = await txn.insert(hymnTable, hymn.toJson());
     });
     return res;
   }
 
   Future<List> getAllHymns() async {
-    var dbClient = await getDB;
-    var result;
+    Database? dbClient = await getDB;
+    List? result;
     await dbClient?.transaction((txn) async {
       result = await txn.rawQuery("SELECT * FROM $hymnTable");
     });
-    return result.toList();
+    return result!.toList();
   }
 
   /* Future<List> getFavHymns() async {
     var dbClient = db;
-    var result;
+   int? result;
     await dbClient.transaction((txn) async {
       result = await txn
           .rawQuery("SELECT * FROM $hymnTable WHERE $col_favorite == 1");
@@ -82,29 +82,29 @@ class DatabaseHelper {
   }*/
 
   Future<ComposeHymns?> getHymns(int id) async {
-    var dbClient = db;
-    var result;
+    Database? dbClient = db;
+    List? result;
     await dbClient?.transaction((txn) async {
       result =
           await txn.rawQuery("SELECT * FROM $hymnTable WHERE $colId = $id");
     });
-    if (result.length == 0) return null;
-    return ComposeHymns.fromJson(result.first);
+    if (result!.isEmpty) return null;
+    return ComposeHymns.fromJson(result?.first);
   }
 
   Future<int> deleteHymns(int id) async {
-    var dbClient = await getDB;
-    var result;
+    Database? dbClient = await getDB;
+    int? result;
     await dbClient?.transaction((txn) async {
       result =
-          await txn.delete("$hymnTable", where: "$colId = ?", whereArgs: [id]);
+          await txn.delete(hymnTable, where: "$colId = ?", whereArgs: [id]);
     });
-    return result;
+    return result!;
   }
 
 /*  Future<int> updateHymns(Hymns user) async {
     var dbClient = await db;
-    var result;
+   int? result;
     await dbClient.transaction((txn) async {
       result = await txn.update("$hymnTable", user.toMap(),
           where: "$rowId = ?", whereArgs: [user.id]);
@@ -113,7 +113,7 @@ class DatabaseHelper {
   }*/
 
   Future closeDb() async {
-    var dbClient = await getDB;
+    Database? dbClient = await getDB;
     dbClient?.close();
   }
 }

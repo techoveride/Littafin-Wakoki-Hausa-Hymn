@@ -13,9 +13,9 @@ GlobalKey<_HymnListingState> hymnGKey = GlobalKey();
 
 class HymnListing extends StatefulWidget {
   final ValueChanged<Hymns>? hymnSelectedCallback;
-  late Hymns hymnSelected;
+  final Hymns? hymnSelected;
 
-  HymnListing({Key? key, this.hymnSelectedCallback, required this.hymnSelected})
+  HymnListing({Key? key, this.hymnSelectedCallback, this.hymnSelected})
       : super(key: key);
 
   @override
@@ -25,7 +25,7 @@ class HymnListing extends StatefulWidget {
 class _HymnListingState extends State<HymnListing> {
   late File jsonFile;
   late Directory dir;
-  String fileName = "HymnLyricsHausa.json";
+  // String fileName = "HymnLyricsHausa.json";
   bool fileExists = false;
 
   List<Hymns> _hymnList = <Hymns>[];
@@ -57,7 +57,7 @@ class _HymnListingState extends State<HymnListing> {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/HymnLyricsHausa.json');
+    return File('$path/${globals.fileName}');
   }
 
 //  Future<File> _writeData(String message) async {
@@ -75,7 +75,7 @@ class _HymnListingState extends State<HymnListing> {
       _hymnList =
           List<Hymns>.from(hymn.map((i) => Hymns.fromJson(i))).where((item) {
         search =
-            item.title.trim().toLowerCase() + " " + item.lyric.toLowerCase();
+            "${item.title.trim().toLowerCase()} ${item.lyric.toLowerCase()}";
         return search.contains(value.toLowerCase());
       }).toList();
       hymnSize = _hymnList.length;
@@ -199,7 +199,7 @@ class _HymnListingState extends State<HymnListing> {
         padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
         child: DraggableScrollbar.arrows(
           alwaysVisibleScrollThumb: true,
-          backgroundColor: Theme.of(context).accentColor,
+          backgroundColor: Theme.of(context).colorScheme.secondary,
           padding: const EdgeInsets.only(right: 4.0),
           labelTextBuilder: (double offset) => Text(
               "${(offset ~/ _itemExtent) + 1}",
@@ -222,7 +222,7 @@ class _HymnListingState extends State<HymnListing> {
                       style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 18.0,
-                          color: Theme.of(context).accentColor),
+                          color: Theme.of(context).colorScheme.secondary),
                     ),
                     title: Text(
                       _hymnList[index]
@@ -234,11 +234,13 @@ class _HymnListingState extends State<HymnListing> {
                     ),
                     selected: widget.hymnSelected == _hymnList[index],
                     onTap: () async {
-                      widget.hymnSelectedCallback!(_hymnList[index]);
+                      widget.hymnSelectedCallback!(
+                        _hymnList[index],
+                      );
                       // widget.hymnSelected == ;
                       if (kDebugMode) {
                         print("\n${_hymnList[index].id}"
-                            "\nSelected hymn number : ${widget.hymnSelected.id} \n "
+                            "\nSelected hymn number : ${widget.hymnSelected?.id} \n "
                             "List Index : $index");
                       }
                       if (globals.isPlaying) {

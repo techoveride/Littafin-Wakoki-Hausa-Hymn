@@ -52,7 +52,7 @@ class _MasterDetailsScreenState extends State<MasterDetailsScreen>
     // startAppSdk.setTestAdsEnabled(true);
     loadBanner();
     loadInterstitial();
-    Future.delayed(const Duration(minutes: 5), () {
+    Future.delayed(const Duration(seconds: 5), () {
       buildInterstitial();
     });
 
@@ -119,30 +119,38 @@ class _MasterDetailsScreenState extends State<MasterDetailsScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      RaisedButton(
-                        shape: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: const Text("No"),
-                        splashColor: Theme.of(context).splashColor,
-                        color: Theme.of(context).colorScheme.primaryContainer,
+                      ElevatedButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            )),
+                            overlayColor: MaterialStateProperty.all<Color>(
+                                Theme.of(context).splashColor)),
                         onPressed: () {
                           Navigator.of(context).pop(false);
                         },
-                      ),
-                      RaisedButton(
-                        shape: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
+                        child: const Text(
+                          "No",
+                          style: TextStyle(color: Colors.black),
                         ),
-                        child: const Text("Yes"),
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        splashColor: Theme.of(context).splashColor,
+                      ),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            )),
+                            overlayColor: MaterialStateProperty.all<Color>(
+                                Theme.of(context).splashColor)),
                         onPressed: () {
-                          // Navigator.of(_).pop(true);
-                          // SystemNavigator.pop();
                           SystemChannels.platform
                               .invokeMethod('SystemNavigator.pop');
                         },
+                        child: const Text(
+                          "Yes",
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
                     ],
                   ),
@@ -205,10 +213,6 @@ class _MasterDetailsScreenState extends State<MasterDetailsScreen>
     return HymnListing(
       key: hymnGKey,
       hymnSelectedCallback: (hymnSelected) {
-        debugPrint("Hymn Clicked: ${hymnSelected.title}");
-        setState(() {
-          _selectedHymn = hymnSelected;
-        });
         Navigator.push(context,
             MaterialPageRoute(builder: (BuildContext context) {
           return HymnDetails(
@@ -218,7 +222,6 @@ class _MasterDetailsScreenState extends State<MasterDetailsScreen>
           );
         }));
       },
-      hymnSelected: _selectedHymn,
     );
   }
 
@@ -304,8 +307,8 @@ class _MasterDetailsScreenState extends State<MasterDetailsScreen>
               buildBanner: buildBanner,
               isTabletLayout: isTabletLayout),
           bottomNavigationBar: SizedBox(
-            child: bannerAd != null ? StartAppBanner(bannerAd!) : Container(),
             height: adPadding,
+            child: bannerAd != null ? StartAppBanner(bannerAd!) : Container(),
             // width: 320.0,
           ),
         ),
@@ -474,10 +477,10 @@ class _MasterDetailsScreenState extends State<MasterDetailsScreen>
     startAppSdk
         .loadBannerAd(StartAppBannerType.BANNER,
             prefs: const StartAppAdPreferences(adTag: "homepage"))
-        .then((_bannerAd) {
+        .then((bannerAd) {
       setState(() {
-        bannerAd = _bannerAd;
-        adPadding = _bannerAd.height!.toDouble();
+        bannerAd = bannerAd;
+        adPadding = bannerAd.height!.toDouble();
       });
     }).onError<StartAppException>((ex, stackTrace) {
       debugPrint("Error loading Banner ad: ${ex.message}");
@@ -537,8 +540,7 @@ class _MasterDetailsScreenState extends State<MasterDetailsScreen>
         double.parse(info.version.trim().replaceAll(".", ""));
     globals.app_version = info.version.trim().replaceAll(".", "");
     //Get Latest version info from firebase config
-    final FirebaseRemoteConfig remoteConfig =
-        await FirebaseRemoteConfig.instance;
+    final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
     try {
       // Using default duration to force fetching from remote server.
       // await remoteConfig.fetch(expiration: const Duration(seconds: 0));
@@ -561,15 +563,17 @@ class _MasterDetailsScreenState extends State<MasterDetailsScreen>
       double newVersion =
           double.parse(remoteVersion.trim().replaceAll(".", ""));
       if (newVersion > currentVersion) {
-        _showVersionDialog(context);
+        _showVersionDialog();
       }
     } catch (exception) {
-      print('Unable to fetch remote config. Cached or default values will be '
-          'used\nException: $exception');
+      if (kDebugMode) {
+        print('Unable to fetch remote config. Cached or default values will be '
+            'used\nException: $exception');
+      }
     }
   }
 
-  _showVersionDialog(context) async {
+  _showVersionDialog() async {
     await showDialog<String>(
       context: context,
       barrierDismissible: false,
@@ -613,9 +617,9 @@ class _MasterDetailsScreenState extends State<MasterDetailsScreen>
   }
 
   _launchURL(String myUrl) async {
-    var url = myUrl;
-    if (await canLaunch(url)) {
-      await launch(url);
+    Uri url = Uri.parse(myUrl);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {
       throw 'Could not launch $url';
     }

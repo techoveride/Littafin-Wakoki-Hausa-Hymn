@@ -33,8 +33,7 @@ class MyDrawer extends StatefulWidget {
 
 class _MyDrawerState extends State<MyDrawer> {
   loadRemoteConfig() async {
-    final FirebaseRemoteConfig remoteConfig =
-        await FirebaseRemoteConfig.instance;
+    final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
     try {
       // Using default duration to force fetching from remote server.
       await remoteConfig.fetchAndActivate();
@@ -59,8 +58,8 @@ class _MyDrawerState extends State<MyDrawer> {
   }
 
   static const int tabletBreakpoint = 600;
-  var shortestSide;
-  var orientation;
+  late double shortestSide;
+  late Orientation orientation;
 
   @override
   Widget build(BuildContext context) {
@@ -82,9 +81,10 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
             ),
             decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [Colors.black, Theme.of(context).accentColor],
-                    transform: const GradientRotation(0.0))),
+                gradient: LinearGradient(colors: [
+              Colors.black,
+              Theme.of(context).colorScheme.secondary
+            ], transform: const GradientRotation(0.0))),
             accountName: const Text(
               "Hymnestry",
             ),
@@ -94,11 +94,11 @@ class _MyDrawerState extends State<MyDrawer> {
           ),
           ListTile(
               leading: ConstrainedBox(
+                constraints: BoxConstraints.tight(const Size.square(34.0)),
                 child: Image.asset(
                   'images/premium.png',
                   color: globals.nightMode ? Colors.white : Colors.black54,
                 ),
-                constraints: BoxConstraints.tight(const Size.square(34.0)),
               ),
               title: const Text(
                 "Premium Upgrade(No Ads)",
@@ -225,7 +225,7 @@ class _MyDrawerState extends State<MyDrawer> {
             ),
             onTap: () async {
               await loadRemoteConfig();
-              versionUpdate(context);
+              versionUpdate();
             },
           ),
           ListTile(
@@ -269,7 +269,7 @@ class _MyDrawerState extends State<MyDrawer> {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             primary:
-                                Theme.of(context).colorScheme.primaryVariant,
+                                Theme.of(context).colorScheme.primaryContainer,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0)),
                             onPrimary: Colors.white,
@@ -282,7 +282,7 @@ class _MyDrawerState extends State<MyDrawer> {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             primary:
-                                Theme.of(context).colorScheme.primaryVariant,
+                                Theme.of(context).colorScheme.primaryContainer,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0)),
                             onPrimary: Colors.white,
@@ -307,9 +307,10 @@ class _MyDrawerState extends State<MyDrawer> {
           ));
 
   _launchURL(String myUrl) async {
-    var url = myUrl;
-    if (await canLaunch(url)) {
-      await launch(url);
+    Uri url = Uri.parse(myUrl);
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {
       throw 'Could not launch $url';
     }
@@ -436,17 +437,17 @@ class _MyDrawerState extends State<MyDrawer> {
         });
   }
 
-  void versionUpdate(BuildContext context) async {
-    if (globals.app_version == null || globals.app_update == null) {
+  void versionUpdate() async {
+    if (globals.app_version.isEmpty || globals.app_update.isEmpty) {
       updateDialog(context);
     } else {
       //Get Current installed version of app
       double defaultVersion =
           double.parse(globals.app_version.trim().replaceAll(".", ""));
-//      debugPrint("default :$defaultVersion");
+      debugPrint("default Version :$defaultVersion");
       double newVersion =
           double.parse(globals.app_update.trim().replaceAll(".", ""));
-//      debugPrint(newVersion);
+      debugPrint("New Version : $newVersion");
       if (newVersion > defaultVersion) {
         _showVersionDialog(context);
       } else {
@@ -470,7 +471,6 @@ class _MyDrawerState extends State<MyDrawer> {
         : url = globals.APP_STORE_URL;
 
     Share.share(
-        "Worship God in Awe\nInstall Littafin Wakoki app and enjoy the free tunes attached to each hymn.\nGet it here: \n " +
-            url);
+        "Worship God in Awe\nInstall Littafin Wakoki app and enjoy the free tunes attached to each hymn.\nGet it here: \n $url");
   }
 }

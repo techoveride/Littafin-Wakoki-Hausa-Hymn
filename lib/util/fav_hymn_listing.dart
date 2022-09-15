@@ -43,13 +43,15 @@ class _FavHymnListingState extends State<FavHymnListing> {
   final IconData _off = Icons.flash_off;
   final IconData _on = Icons.flash_on;
 
+  // Orientation orientation = Orientation.portrait;
+
   onSearchedItem(String value) {
     // print(value);
     String search;
     setState(() {
       _favHymnList = listHymns.where((item) {
         search =
-            item.title.trim().toLowerCase() + " " + item.lyric.toLowerCase();
+            "${item.title.trim().toLowerCase()} ${item.lyric.toLowerCase()}";
         return search.contains(value.toLowerCase()) && item.favorite == 1;
       }).toList();
       hymnSize = _favHymnList.length;
@@ -91,7 +93,7 @@ class _FavHymnListingState extends State<FavHymnListing> {
 
   late File jsonFile;
   late Directory dir;
-  String fileName = "HymnLyricsHausa.json";
+  // String fileName = "${globals.fileName}";
   bool fileExists = false;
 
   Future<List<Hymns>> getHymn() async {
@@ -118,7 +120,7 @@ class _FavHymnListingState extends State<FavHymnListing> {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/HymnLyricsHausa.json');
+    return File('$path/${globals.fileName}');
   }
 
   loadFav() async {
@@ -145,6 +147,8 @@ class _FavHymnListingState extends State<FavHymnListing> {
 
   @override
   Widget build(BuildContext context) {
+    // orientation = MediaQuery.of(context).orientation;
+
     return hymnFavList();
   }
 
@@ -152,93 +156,79 @@ class _FavHymnListingState extends State<FavHymnListing> {
     return Padding(
         padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
         child: DraggableScrollbar.arrows(
-          alwaysVisibleScrollThumb: true,
-          backgroundColor: Theme.of(context).accentColor,
-          padding: const EdgeInsets.only(right: 4.0),
-          labelTextBuilder: (double offset) => Text(
-              "${(offset ~/ _itemExtent) + 1}",
-              style: const TextStyle(color: Colors.white)),
-          controller: _scrollControl,
-          child: _favHymnList != null
-              ? _favHymnList.isNotEmpty
-                  ? ListView.builder(
-                      controller: _scrollControl,
-                      itemCount: _favHymnList.length,
-                      itemBuilder: (_, index) {
-                        return Card(
-                          elevation: 4.5,
-                          margin: const EdgeInsets.only(
-                              bottom: 3.0, right: 4.0, left: 4.0),
-                          child: ListTile(
-                              leading: Text(
-                                _favHymnList[index].title.substring(
-                                    0, _favHymnList[index].title.indexOf('-')),
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 18.0,
-                                    color: Theme.of(context).accentColor),
-                              ),
-                              trailing: IconButton(
-                                  icon: Icon(favIcon),
-                                  onPressed: () {
-                                    int row = _favHymnList[index].id - 1;
-                                    updateFavorite(row);
-                                  }),
-                              title: Text(
-                                _favHymnList[index].title.substring(
-                                    _favHymnList[index].title.indexOf('-') + 1),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                softWrap: true,
-                              ),
-                              selected:
-                                  widget.hymnSelected == _favHymnList[index],
-                              onTap: () async {
-                                widget.hymnSelectedCallback!(
-                                  _favHymnList[index],
-                                );
-                                if (globals.isPlaying) {
-                                  setState(() {
-                                    globals.tuneIcon = globals.play;
-                                    globals.playerState =
-                                        AudioPlayerState.STOPPED;
-                                  });
-                                  await globals.player.stop();
-                                }
-                                globals.load(_favHymnList[index].title);
-                              }),
-                        );
-                      },
-                    )
-                  : ListView(
-                      children: const <Widget>[
-                        Card(
-                          elevation: 4.5,
-                          margin: EdgeInsets.only(
-                              bottom: 3.0, right: 4.0, left: 4.0),
-                          child: ListTile(
-                            title: Text("Favorite Hymn Not found"),
-                            subtitle: Text(
-                                "Add a Hymn by clicking on the favorite icon!"),
-                          ),
-                        )
-                      ],
-                    )
-              : ListView(
-                  children: const <Widget>[
-                    Card(
-                      elevation: 4.5,
-                      margin:
-                          EdgeInsets.only(bottom: 3.0, right: 4.0, left: 4.0),
-                      child: ListTile(
-                        title: Text("Favorite Hymn Not found"),
-                        subtitle: Text(
-                            "Add a Hymn by clicking on the favorite icon!"),
-                      ),
-                    )
-                  ],
-                ),
-        ));
+            alwaysVisibleScrollThumb: true,
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            padding: const EdgeInsets.only(right: 4.0),
+            labelTextBuilder: (double offset) => Text(
+                "${(offset ~/ _itemExtent) + 1}",
+                style: const TextStyle(color: Colors.white)),
+            controller: _scrollControl,
+            child: _favHymnList.isNotEmpty
+                ? ListView.builder(
+                    controller: _scrollControl,
+                    itemCount: _favHymnList.length,
+                    itemBuilder: (_, index) {
+                      return Card(
+                        elevation: 4.5,
+                        margin: const EdgeInsets.only(
+                            bottom: 3.0, right: 4.0, left: 4.0),
+                        child: ListTile(
+                            leading: Text(
+                              _favHymnList[index].title.substring(
+                                  0, _favHymnList[index].title.indexOf('-')),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 18.0,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary),
+                            ),
+                            trailing: IconButton(
+                                icon: Icon(favIcon),
+                                onPressed: () {
+                                  int row = _favHymnList[index].id - 1;
+                                  updateFavorite(row);
+                                  snackBuilder(index);
+                                }),
+                            title: Text(
+                              _favHymnList[index].title.substring(
+                                  _favHymnList[index].title.indexOf('-') + 1),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
+                            ),
+                            selected:
+                                widget.hymnSelected == _favHymnList[index],
+                            onTap: () async {
+                              widget.hymnSelectedCallback!(
+                                _favHymnList[index],
+                              );
+                              if (globals.isPlaying) {
+                                setState(() {
+                                  globals.tuneIcon = globals.play;
+                                  globals.playerState =
+                                      AudioPlayerState.STOPPED;
+                                });
+                                await globals.player.stop();
+                              }
+                              globals.load(_favHymnList[index].title);
+                            }),
+                      );
+                    },
+                  )
+                : ListView(
+                    children: const <Widget>[
+                      Card(
+                        elevation: 4.5,
+                        margin:
+                            EdgeInsets.only(bottom: 3.0, right: 4.0, left: 4.0),
+                        child: ListTile(
+                          title: Text("Favorite Hymn Not found"),
+                          subtitle: Text(
+                              "Add a Hymn by clicking on the favorite icon!"),
+                        ),
+                      )
+                    ],
+                  )));
   }
 
   /* Widget hymnFavList() {
@@ -322,7 +312,7 @@ class _FavHymnListingState extends State<FavHymnListing> {
   }*/
   Future<File> _writeData(String message) async {
     final file = await getApplicationDocumentsDirectory().then((dir) {
-      return File("${dir.path}/HymnLyricsHausa.json");
+      return File("${dir.path}/${globals.fileName}");
     });
     return file.writeAsString(message);
   }
@@ -343,6 +333,12 @@ class _FavHymnListingState extends State<FavHymnListing> {
           return val.favorite == 1;
         }).toList();
       });
+      //Show Snackbar
+      // if (orientation == Orientation.portrait) {
+      //   snackBuilder(index);
+      // } else {
+      //   tabSnackBuilder(index);
+      // }
     }
   }
 
@@ -350,20 +346,16 @@ class _FavHymnListingState extends State<FavHymnListing> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          "Hymn ${_favHymnList[index].title.substring(0, 3)}" +
-              (favIcon == _on
-                  ? ' added to favorites'
-                  : ' removed from favorites'),
+          "Hymn ${_favHymnList[index].title.substring(0, 3)}${' removed from favorites'}",
         ),
       ),
     );
   }
 
-  void tabSnackBuilder(BuildContext context, int index) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(
-      "Hymn ${_favHymnList[index].title.substring(0, 3)}" +
-          (favIcon == _on ? ' added to favorites' : ' removed from favorites'),
-    )));
-  }
+  // void tabSnackBuilder(int index) {
+  //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       content: Text(
+  //     "Hymn ${_favHymnList[index].title.substring(0, 3)}${favIcon == _on ? ' added to favorites' : ' removed from favorites'}",
+  //   )));
+  // }
 }

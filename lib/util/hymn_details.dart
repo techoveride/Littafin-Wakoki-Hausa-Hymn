@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:audioplayer/audioplayer.dart';
+import 'package:flutter/foundation.dart';
 // import  'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:littafin_wakoki/model/globals.dart' as globals;
@@ -30,12 +31,12 @@ class _HymnDetailsState extends State<HymnDetails> {
 
   late File jsonFile;
   late Directory dir;
-  String fileName = "HymnLyricsHausa.json";
+  // String fileName = "HymnLyricsHausa_v1.json";
   bool fileExists = false;
   bool isPlaying = false;
 
-  var hymn;
-  List<Hymns> _hymnList = <Hymns>[];
+  // var hymn ;
+  List<Hymns>? _hymnList;
 
   int hymnSize = 0;
 
@@ -58,29 +59,37 @@ class _HymnDetailsState extends State<HymnDetails> {
     audioPlayerStateSubs =
         globals.player.onPlayerStateChanged.listen((listener) async {
       if (listener == AudioPlayerState.PLAYING) {
-        print("Tune playing");
+        if (kDebugMode) {
+          print("Tune playing");
+        }
       } else if (listener == AudioPlayerState.STOPPED) {
-        print("Tune Stopped");
+        if (kDebugMode) {
+          print("Tune Stopped");
+        }
       } else if (listener == AudioPlayerState.COMPLETED) {
-        print("Tune Completed");
+        if (kDebugMode) {
+          print("Tune Completed");
+        }
         await globals.player.stop();
         setState(() {
           globals.tuneIcon = globals.play;
           globals.playerState = AudioPlayerState.COMPLETED;
         });
         widget.isInTabletLayout
-            ? tabOnCompletedSnackbar(context)
+            ? tabOnCompletedSnackbar()
             : onCompletedSnackbar();
       } else if (listener == AudioPlayerState.PAUSED) {
-        print("Tune Paused");
+        if (kDebugMode) {
+          print("Tune Paused");
+        }
       }
     }, onError: (error) async {
       globals.playerState = AudioPlayerState.STOPPED;
       await stopPlayer();
-      widget.isInTabletLayout
-          ? audioTabSnackBuilder(context)
-          : audioSnackBuilder();
-      print("AudioPlayer Subscription error $error");
+      widget.isInTabletLayout ? audioTabSnackBuilder() : audioSnackBuilder();
+      if (kDebugMode) {
+        print("AudioPlayer Subscription error $error");
+      }
     });
   }
 
@@ -102,26 +111,29 @@ class _HymnDetailsState extends State<HymnDetails> {
 
   Future<File> _writeData(String message) async {
     final file = await getApplicationDocumentsDirectory().then((dir) {
-      return File("${dir.path}/HymnLyricsHausa.json");
+      return File("${dir.path}/${globals.fileName}");
     });
     return file.writeAsString(message);
   }
 
   void updateFavorite(int index, int flag) {
-    listHymns = _hymnList;
+    listHymns = _hymnList!;
     listHymns[index].favorite = flag;
     _writeData(json.encode(listHymns));
   }
 
-  Future<List<Hymns>> getHymn() async {
+  Future<List<Hymns>?> getHymn() async {
     jsonFile = await getApplicationDocumentsDirectory()
-        .then((dir) => File("${dir.path}/$fileName"));
+        .then((dir) => File("${dir.path}/${globals.fileName}"));
     fileExists = jsonFile.existsSync();
     if (fileExists) {
-      hymn = json.decode(jsonFile.readAsStringSync());
+      var hymn = json.decode(jsonFile.readAsStringSync());
       setState(() {
         _hymnList = List<Hymns>.from(hymn.map((i) => Hymns.fromJson(i)));
-        hymnSize = _hymnList.length;
+        if (kDebugMode) {
+          print("Hymn Size Onload${_hymnList?.length}");
+        }
+        hymnSize = _hymnList!.length;
       });
     }
     favInit();
@@ -170,8 +182,8 @@ class _HymnDetailsState extends State<HymnDetails> {
                     textAlign: TextAlign.center,
                     style: globals.titleStyle()),
                 subtitle: Text(
-                  '\n${widget.hymns.author}' +
-                      "\n${widget.hymns.tune!.isNotEmpty ? widget.hymns.tune : ''}",
+                  '\n${widget.hymns.author}'
+                  "\n${widget.hymns.tune!.isNotEmpty ? widget.hymns.tune : ''}",
                   textAlign: TextAlign.center,
                   style: globals.subheadStyle(),
                 ),
@@ -241,7 +253,7 @@ class _HymnDetailsState extends State<HymnDetails> {
                         margin: const EdgeInsets.all(0.0),
                         elevation: 4.0,
                         clipBehavior: Clip.none,
-                        color: Theme.of(context).colorScheme.inversePrimary,
+                        color: Theme.of(context).colorScheme.tertiary,
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -254,7 +266,7 @@ class _HymnDetailsState extends State<HymnDetails> {
                                 onPressed: () async {
                                   if (globals.isPlaying) {
                                     await pausePlayer();
-                                    audioTabSnackBuilder(context);
+                                    audioTabSnackBuilder();
                                   } else {
                                     await globals.playSound();
                                     setState(() {
@@ -262,7 +274,7 @@ class _HymnDetailsState extends State<HymnDetails> {
                                       globals.playerState =
                                           AudioPlayerState.PLAYING;
                                     });
-                                    audioTabSnackBuilder(context);
+                                    audioTabSnackBuilder();
                                   }
                                 }),
                             IconButton(
@@ -270,7 +282,7 @@ class _HymnDetailsState extends State<HymnDetails> {
                                     color: Theme.of(context).cardColor),
                                 onPressed: () async {
                                   await stopPlayer();
-                                  audioTabSnackBuilder(context);
+                                  audioTabSnackBuilder();
                                 }),
                           ],
                         ),
@@ -309,7 +321,7 @@ class _HymnDetailsState extends State<HymnDetails> {
                 padding: const EdgeInsets.only(left: 14.0),
                 child: FloatingActionButton(
                   onPressed: () {
-                    int index = _hymnList[widget.hymns.id - 1].id - 1;
+                    int index = _hymnList![widget.hymns.id - 1].id - 1;
                     setState(() {
                       if (favIcon == _off) {
                         favIcon = _on;
@@ -321,16 +333,16 @@ class _HymnDetailsState extends State<HymnDetails> {
                     });
                     tabSnackBuilder(context, index);
                   },
-                  child: Icon(favIcon),
                   mini: true,
                   heroTag: 'favBtn',
+                  child: Icon(favIcon),
                 ),
               ),
               FloatingActionButton(
                 onPressed: () => shareIntent(),
-                child: const Icon(Icons.share),
                 mini: true,
                 heroTag: 'shareBtn',
+                child: const Icon(Icons.share),
               ),
             ],
           ),
@@ -377,7 +389,7 @@ class _HymnDetailsState extends State<HymnDetails> {
             IconButton(
                 icon: Icon(favIcon),
                 onPressed: () {
-                  int index = _hymnList[widget.hymns.id - 1].id - 1;
+                  int index = _hymnList![widget.hymns.id - 1].id - 1;
                   setState(() {
                     if (favIcon == _off) {
                       favIcon = _on;
@@ -441,10 +453,7 @@ class _HymnDetailsState extends State<HymnDetails> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          "Hymn ${_hymnList[index].title.substring(0, 3)}" +
-              (favIcon == _on
-                  ? ' added to favorites'
-                  : ' removed from favorites'),
+          "Hymn ${_hymnList![index].title.substring(0, 3)}${favIcon == _on ? ' added to favorites' : ' removed from favorites'}",
         ),
       ),
     );
@@ -453,17 +462,14 @@ class _HymnDetailsState extends State<HymnDetails> {
   void tabSnackBuilder(BuildContext context, int index) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
-      "Hymn ${_hymnList[index].title.substring(0, 3)}" +
-          (favIcon == _on ? ' added to favorites' : ' removed from favorites'),
+      "Hymn ${_hymnList![index].title.substring(0, 3)}${favIcon == _on ? ' added to favorites' : ' removed from favorites'}",
     )));
   }
 
   void favInit() {
-    print("Hymn title:=== ${widget.hymns.title}");
-    // print("Hymn title:=== ${_hymnList.title}");
     if (widget.hymns.id != -1 && _hymnList != null) {
-      int id = _hymnList[widget.hymns.id - 1].id - 1;
-      if (_hymnList[id].favorite == 1) {
+      int id = _hymnList![widget.hymns.id - 1].id - 1;
+      if (_hymnList![id].favorite == 1) {
         favIcon = _on;
       } else {
         favIcon = _off;
@@ -509,7 +515,7 @@ class _HymnDetailsState extends State<HymnDetails> {
     );
   }
 
-  void audioTabSnackBuilder(BuildContext context) {
+  void audioTabSnackBuilder() {
     String popUp;
     if (globals.playerState == AudioPlayerState.PLAYING) {
       popUp = "Tune Playing";
@@ -528,7 +534,7 @@ class _HymnDetailsState extends State<HymnDetails> {
     ));
   }
 
-  void tabOnCompletedSnackbar(BuildContext context) {
+  void tabOnCompletedSnackbar() {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: const Text(
           "Tune Completed",

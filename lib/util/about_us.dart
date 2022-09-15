@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../model/globals.dart' as globals;
+
 class AboutUs extends StatelessWidget {
   ColorScheme? theme;
 
   @override
   Widget build(BuildContext context) {
     theme = Theme.of(context).colorScheme;
+    String versionName =
+        "${globals.app_version.substring(0, 1)}.${globals.app_version.substring(1, 2)}.${globals.app_version.substring(2)}";
     return Scaffold(
       appBar: AppBar(
         title: const Text("About Us"),
@@ -31,7 +35,7 @@ class AboutUs extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              "Sacred Songs & Solos(SS&S)\n Hausa ,Version 1.1.2 \n © 2020 \n SS&S hymn app is a lyrics based application developed for Christians to worship the Almighty God more and more through music \n Offered by: Hymnestry Apps",
+              "Sacred Songs & Solos(SS&S)\n Hausa ,Version $versionName \n © 2020 \n SS&S hymn app is a lyrics based application developed for Christians to worship the Almighty God more and more through music \n Offered by: Hymnestry Apps",
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headline5,
             ),
@@ -105,9 +109,9 @@ class AboutUs extends StatelessWidget {
   }
 
   _launchURL(String myUrl) async {
-    var url = myUrl;
-    if (await canLaunch(url)) {
-      await launch(url);
+    Uri url = Uri.parse(myUrl);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {
       throw 'Could not launch $url';
     }

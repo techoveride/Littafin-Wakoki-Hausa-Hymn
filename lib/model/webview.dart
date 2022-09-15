@@ -26,7 +26,7 @@ class _PaymentWebViewState extends State<PaymentWebView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Donate Now"),
+        title: const Text("Donate Now"),
         centerTitle: true,
       ),
       body: IndexedStack(index: _page, children: <Widget>[
@@ -39,7 +39,7 @@ class _PaymentWebViewState extends State<PaymentWebView> {
         ),
         Container(
           color: Colors.white,
-          child: Center(child: CircularProgressIndicator()),
+          child: const Center(child: CircularProgressIndicator()),
         ),
       ]),
     );

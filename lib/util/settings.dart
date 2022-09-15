@@ -474,16 +474,23 @@ class _SettingsState extends State<Settings> {
                 actions: <Widget>[
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: RaisedButton.icon(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0)),
+                    child: ElevatedButton.icon(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(accentColor),
+                          overlayColor: MaterialStateProperty.all(splash),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0)),
+                          )),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      splashColor: splash,
-                      color: accentColor,
                       icon: const Icon(Icons.cancel),
-                      label: const Text("Done"),
+                      label: const Text(
+                        "Done",
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                   )
                 ],
@@ -584,16 +591,23 @@ class _SettingsState extends State<Settings> {
                 actions: <Widget>[
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: RaisedButton.icon(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0)),
+                    child: ElevatedButton.icon(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(accentColor),
+                          overlayColor: MaterialStateProperty.all(splash),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0)),
+                          )),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      splashColor: splash,
-                      color: accentColor,
                       icon: const Icon(Icons.cancel),
-                      label: const Text("Done"),
+                      label: const Text(
+                        "Done",
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                   )
                 ],
@@ -822,16 +836,23 @@ class _SettingsState extends State<Settings> {
                 actions: <Widget>[
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: RaisedButton.icon(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0)),
+                    child: ElevatedButton.icon(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(accentColor),
+                          overlayColor: MaterialStateProperty.all(splash),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0)),
+                          )),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      splashColor: splash,
-                      color: theme.primary,
                       icon: const Icon(Icons.cancel),
-                      label: const Text("Done"),
+                      label: const Text(
+                        "Done",
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                   )
                 ],
@@ -1060,16 +1081,23 @@ class _SettingsState extends State<Settings> {
                 actions: <Widget>[
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: RaisedButton.icon(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0)),
+                    child: ElevatedButton.icon(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(accentColor),
+                          overlayColor: MaterialStateProperty.all(splash),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0)),
+                          )),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      splashColor: splash,
-                      color: accentColor,
                       icon: const Icon(Icons.cancel),
-                      label: const Text("Done"),
+                      label: const Text(
+                        "Done",
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ),
                   )
                 ],
@@ -1159,7 +1187,6 @@ class _SettingsState extends State<Settings> {
       case 4294967295:
         return _textRadioSelected = 'white';
 
-        break;
       case 4294198070:
         return _textRadioSelected = 'red';
 
@@ -1171,11 +1198,9 @@ class _SettingsState extends State<Settings> {
       case 4283215696:
         return _textRadioSelected = 'green';
 
-        break;
       case 4278190080:
         return _textRadioSelected = 'black';
 
-        break;
       case 1660944383:
         return _textRadioSelected = 'silver';
 
@@ -1331,7 +1356,6 @@ class _SettingsState extends State<Settings> {
       case 'blue':
         return Colors.blue;
 
-        break;
       case 'green':
         return Colors.green;
 
@@ -1339,35 +1363,26 @@ class _SettingsState extends State<Settings> {
       case 'black':
         return Colors.black;
 
-        break;
       case 'silver':
         return Colors.black12;
 
-        break;
       case 'grey':
         return Colors.grey;
 
-        break;
       case 'lime':
         return Colors.lime;
 
-        break;
       case 'teal':
         return Colors.teal;
 
-        break;
       case 'navy':
         return Colors.blueAccent;
 
-        break;
       case 'indigo':
         return Colors.indigo;
 
-        break;
       default:
         return Colors.lightGreenAccent;
-
-        break;
     }
   }
 }

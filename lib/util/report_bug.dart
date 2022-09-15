@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 
 class ReportBug extends StatelessWidget {
-  var _reportController = TextEditingController();
+  final _reportController = TextEditingController();
 
   late ColorScheme theme;
 
@@ -14,11 +14,11 @@ class ReportBug extends StatelessWidget {
     splash = Theme.of(context).splashColor;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Report Bug"),
+        title: const Text("Report Bug"),
         centerTitle: true,
-        actions: <Widget>[
+        actions: const <Widget>[
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(8.0),
             child: Icon(Icons.report),
           )
         ],
@@ -46,28 +46,30 @@ class ReportBug extends StatelessWidget {
                         "eg : App crashes when put in landscape mode on version 5.0 android",
                     enabled: true,
                     border: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(width: 1.2, style: BorderStyle.solid),
+                        borderSide: const BorderSide(
+                            width: 1.2, style: BorderStyle.solid),
                         borderRadius: BorderRadius.circular(8.0))),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: RaisedButton(
-                shape: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                color: theme.primaryContainer,
-                child: Text(
-                  "Send Now !",
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-                hoverElevation: 6.0,
-                splashColor: splash,
+              child: ElevatedButton(
+                style: ButtonStyle(
+                    elevation: MaterialStateProperty.all(6.0),
+                    backgroundColor:
+                        MaterialStateProperty.all(theme.primaryContainer),
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    )),
+                    overlayColor: MaterialStateProperty.all<Color>(splash)),
                 onPressed: () {
                   var report = _reportController.text;
                   sendReport(report);
                 },
+                child: Text(
+                  "Send Now !",
+                  style: Theme.of(context).textTheme.headline6,
+                ),
               ),
             )
           ],
@@ -77,7 +79,7 @@ class ReportBug extends StatelessWidget {
   }
 
   void sendReport(report) async {
-    if (report == null) report = '';
+    report ??= '';
     final Email email = Email(
       body: 'Hi Hymnestry !\n\n${report.toString()}'.trim(),
       subject: 'Report Bug/Crash',

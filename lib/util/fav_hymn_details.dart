@@ -15,13 +15,13 @@ GlobalKey<_FavHymnDetailsState> favHymnDetailKey = GlobalKey();
 class FavHymnDetails extends StatefulWidget {
   final bool isInTabletLayout;
   final Hymns hymns;
-  final double adPadding;
+  final double? adPadding;
 
   const FavHymnDetails(
       {Key? key,
       required this.isInTabletLayout,
       required this.hymns,
-      required this.adPadding})
+      this.adPadding})
       : super(key: key);
 
   @override
@@ -31,21 +31,23 @@ class FavHymnDetails extends StatefulWidget {
 class _FavHymnDetailsState extends State<FavHymnDetails> {
   late File jsonFile;
   late Directory dir;
-  String fileName = "HymnLyricsHausa.json";
+  // String fileName = "HymnLyricsHausa.json";
   var hymn;
 
 //  List<Hymns> _favHymnList;
 
-  late int hymnSize;
+  int hymnSize = 0;
 
   late IconData favIcon;
   late StreamSubscription audioPlayerStateSubs;
   late String mp3Uri;
 
-  double? barHeight;
+  double barHeight = 36.0;
+  bool tuneIconVisibility = true;
+
   late ScrollController _scrollController;
 
-  bool tuneIconVisibility = true;
+  double barHeightNew = 36.0;
 
 //load Audio file
   void initAudioPlayer() {
@@ -73,7 +75,7 @@ class _FavHymnDetailsState extends State<FavHymnDetails> {
           globals.playerState = AudioPlayerState.COMPLETED;
         });
         widget.isInTabletLayout
-            ? tabOnCompletedSnackbar(context)
+            ? tabOnCompletedSnackbar()
             : onCompletedSnackbar();
       } else if (listener == AudioPlayerState.PAUSED) {
         if (kDebugMode) {
@@ -83,9 +85,7 @@ class _FavHymnDetailsState extends State<FavHymnDetails> {
     }, onError: (error) async {
       globals.playerState = AudioPlayerState.STOPPED;
       await stopPlayer();
-      widget.isInTabletLayout
-          ? audioTabSnackBuilder(context)
-          : audioSnackBuilder();
+      widget.isInTabletLayout ? audioTabSnackBuilder() : audioSnackBuilder();
       if (kDebugMode) {
         print("AudioPlayer Subscription error $error");
       }
@@ -94,9 +94,9 @@ class _FavHymnDetailsState extends State<FavHymnDetails> {
 
   @override
   void initState() {
-    super.initState();
     initAudioPlayer();
     _scrollController = ScrollController();
+    super.initState();
   }
 
 /*  _loadBgColor() async {
@@ -260,12 +260,12 @@ class _FavHymnDetailsState extends State<FavHymnDetails> {
                     duration: const Duration(milliseconds: 500),
                     opacity: tuneIconVisibility ? 1.0 : 0.0,
                     child: SizedBox(
-                        height: barHeight ?? 36.0,
+                        height: barHeight,
                         child: Card(
                           margin: const EdgeInsets.all(0.0),
                           elevation: 4.0,
                           clipBehavior: Clip.none,
-                          color: Theme.of(context).colorScheme.inversePrimary,
+                          color: Theme.of(context).colorScheme.tertiary,
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -278,7 +278,7 @@ class _FavHymnDetailsState extends State<FavHymnDetails> {
                                   onPressed: () async {
                                     if (globals.isPlaying) {
                                       await pausePlayer();
-                                      audioTabSnackBuilder(context);
+                                      audioTabSnackBuilder();
                                     } else {
                                       await globals.playSound();
                                       setState(() {
@@ -286,7 +286,7 @@ class _FavHymnDetailsState extends State<FavHymnDetails> {
                                         globals.playerState =
                                             AudioPlayerState.PLAYING;
                                       });
-                                      audioTabSnackBuilder(context);
+                                      audioTabSnackBuilder();
                                     }
                                   }),
                               IconButton(
@@ -294,7 +294,7 @@ class _FavHymnDetailsState extends State<FavHymnDetails> {
                                       color: Theme.of(context).cardColor),
                                   onPressed: () async {
                                     await stopPlayer();
-                                    audioTabSnackBuilder(context);
+                                    audioTabSnackBuilder();
                                   }),
                             ],
                           ),
@@ -306,11 +306,23 @@ class _FavHymnDetailsState extends State<FavHymnDetails> {
                             if (status is ScrollUpdateNotification) {
                               if (status.scrollDelta! > 0) {
 //                                Future.delayed(Duration(seconds: 2), () {
+
                                 hideTabTuneBar(true);
 //                                });
+                                setState(() {
+                                  barHeight = 0.0;
+                                  // tuneIconVisibility = true;
+                                  // print("Scrolling Down${barHeight}");
+                                });
                               } else {
 //                                Future.delayed(Duration(seconds: 2), () {
                                 hideTabTuneBar(false);
+                                setState(() {
+                                  barHeight = 36.0;
+                                  // tuneIconVisibility = false;
+                                  // print("Scrolling Up${barHeight}");
+                                });
+
 //                                });
                               }
                             }
@@ -329,14 +341,14 @@ class _FavHymnDetailsState extends State<FavHymnDetails> {
           visible: widget.hymns.id == -1 ? false : true,
           child: FloatingActionButton(
               onPressed: () => shareIntent(),
-              child: const Icon(Icons.share),
-              mini: true),
+              mini: true,
+              child: const Icon(Icons.share)),
         ),
       );
     }
 
     return Padding(
-      padding: EdgeInsets.only(bottom: widget.adPadding),
+      padding: EdgeInsets.only(bottom: widget.adPadding!),
       child: Scaffold(
         key: scaffoldState,
         appBar: AppBar(
@@ -456,7 +468,7 @@ class _FavHymnDetailsState extends State<FavHymnDetails> {
     );
   }
 
-  void audioTabSnackBuilder(BuildContext context) {
+  void audioTabSnackBuilder() {
     String popUp;
     if (globals.playerState == AudioPlayerState.PLAYING) {
       popUp = "Tune Playing";
@@ -475,7 +487,7 @@ class _FavHymnDetailsState extends State<FavHymnDetails> {
     ));
   }
 
-  void tabOnCompletedSnackbar(BuildContext context) {
+  void tabOnCompletedSnackbar() {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: const Text(
           "Tune Completed",
@@ -501,11 +513,12 @@ class _FavHymnDetailsState extends State<FavHymnDetails> {
   void hideTabTuneBar(bool flag) {
     setState(() {
       if (flag == true) {
-        barHeight = 0.0;
         tuneIconVisibility = false;
+        // print(tuneIconVisibility);
       } else {
-        barHeight = 36.0;
+        // barHeight = 36.0;
         tuneIconVisibility = true;
+        // print(tuneIconVisibility);
       }
     });
   }

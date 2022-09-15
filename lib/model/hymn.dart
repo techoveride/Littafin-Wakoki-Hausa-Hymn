@@ -26,13 +26,13 @@ class Hymns {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['author'] = this.author;
-    data['favorite'] = this.favorite;
-    data['id'] = this.id;
-    data['lyric'] = this.lyric;
-    data['title'] = this.title;
-    data['tune'] = this.tune;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['author'] = author;
+    data['favorite'] = favorite;
+    data['id'] = id;
+    data['lyric'] = lyric;
+    data['title'] = title;
+    data['tune'] = tune;
     return data;
   }
 }

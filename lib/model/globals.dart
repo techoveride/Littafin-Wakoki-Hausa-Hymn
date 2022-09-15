@@ -39,8 +39,8 @@ String PREMIUM_APP_STORE_URL =
 String PREMIUM_PLAY_STORE_URL =
     'https://play.google.com/store/apps/details?id=com.hymnestry.littafin_wakoki_pro';
 
-late List<Hymns> defaultHymn = [Hymns(id: 1, lyric: "lyric", title: "title")];
-
+late List<Hymns> defaultHymn;
+const fileName = "HymnLyricsHausa_v1.json";
 // String _fontFamily = 'Courier Prime';
 double _subheadFont = 16.0;
 double _titleFontSize = 30.0;
@@ -48,20 +48,23 @@ double _titleFontSize = 30.0;
 //default theme
 ThemeData defaultTheme() {
   return ThemeData(
+    splashColor: Colors.lightGreenAccent,
+    indicatorColor: Colors.lightGreenAccent,
+    // fontFamily: _fontFamily,
+    textTheme: const TextTheme(
+        headline1: TextStyle(fontWeight: FontWeight.w400),
+        subtitle1: TextStyle(fontWeight: FontWeight.w400),
+        subtitle2: TextStyle(fontWeight: FontWeight.w400),
+        headline6: TextStyle(fontWeight: FontWeight.w400)),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0)))),
+    colorScheme: ColorScheme.fromSwatch(
       primarySwatch: Colors.green,
       accentColor: Colors.lightGreen,
-      // canvasColor: Colors.lightGreen,
-      splashColor: Colors.lightGreenAccent,
-      // fontFamily: _fontFamily,
-      textTheme: const TextTheme(
-          headline1: TextStyle(fontWeight: FontWeight.w400),
-          subtitle1: TextStyle(fontWeight: FontWeight.w400),
-          subtitle2: TextStyle(fontWeight: FontWeight.w400),
-          headline6: TextStyle(fontWeight: FontWeight.w400)),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0)))));
+    ).copyWith(secondary: Colors.lightGreen),
+  );
 }
 
 TextStyle titleStyle() {
@@ -106,7 +109,7 @@ Future<void> load(String song) async {
   String yBuffer =
       int.parse(song.substring(2, song.indexOf('-')).trim()).toString();
   if (buffer.contains('y')) {
-    songBuf = "y" + yBuffer;
+    songBuf = "y$yBuffer";
   } else {
     songBuf = int.parse(buffer).toString();
   }

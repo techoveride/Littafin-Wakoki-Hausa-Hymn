@@ -2,15 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:littafin_wakoki/model/globals.dart' as globals;
 import 'package:littafin_wakoki/util/main_details_screen.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
+
 import 'model/hymn.dart';
 
 //local variables
@@ -23,7 +24,7 @@ void main() async {
   await Firebase.initializeApp();
 
   await getApplicationDocumentsDirectory().then((directory) async {
-    jsonFile = File(join(directory.path, 'HymnLyricsHausa_v1.json'));
+    jsonFile = File(join(directory.path, globals.fileName));
     fileExists = jsonFile.existsSync();
     globals.load("001-Ubangiji Allah, Ga Mu Nan Gabanka");
     if (fileExists) {
@@ -41,7 +42,7 @@ void main() async {
         print("Creating and Writing to File");
       }
       final file = await getApplicationDocumentsDirectory().then((dir) {
-        return File(join(dir.path, 'HymnLyricsHausa_v1.json'));
+        return File(join(dir.path, globals.fileName));
       });
       file.writeAsStringSync(json.encode(listHymns));
       //Loads hymns from bootup

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:littafin_wakoki/model/db_helper.dart';
@@ -16,9 +15,11 @@ class ComposeSong extends StatelessWidget {
   String _tune = "";
   String _lyric = "";
 
+  late Color splash;
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
+    splash = Theme.of(context).splashColor;
 
     return Scaffold(
       appBar: AppBar(
@@ -36,6 +37,8 @@ class ComposeSong extends StatelessWidget {
         child: Builder(
           builder: (snackContext) {
             return Form(
+              key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: ListView(
@@ -98,7 +101,7 @@ class ComposeSong extends StatelessWidget {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                             borderSide: BorderSide(
-                                color: theme.primaryVariant,
+                                color: theme.primaryContainer,
                                 width: 1,
                                 style: BorderStyle.solid),
                           ),
@@ -134,7 +137,7 @@ class ComposeSong extends StatelessWidget {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                             borderSide: BorderSide(
-                                color: theme.primaryVariant,
+                                color: theme.primaryContainer,
                                 width: 1,
                                 style: BorderStyle.solid),
                           ),
@@ -185,7 +188,7 @@ class ComposeSong extends StatelessWidget {
                         ),
                       ),
                     ),
-                    RaisedButton(
+                    ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           addComposedSong();
@@ -195,17 +198,22 @@ class ComposeSong extends StatelessWidget {
                           _formKey.currentState?.reset();
                         }
                       },
-                      child: const Text("Add Song"),
-                      shape: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                      style: ButtonStyle(
+                          overlayColor: MaterialStateProperty.all(splash),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0)),
+                          ),
+                          backgroundColor:
+                              MaterialStateProperty.all(theme.primary)),
+                      child: const Text(
+                        "Add Song",
+                        style: TextStyle(color: Colors.black),
                       ),
-                      color: theme.primary,
                     )
                   ],
                 ),
               ),
-              key: _formKey,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
             );
           },
         ),
