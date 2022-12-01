@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hymnestry.littafin_wakoki">
    <application
-        android:label="Littafin Wakoki (+Tunes)"
+        android:label="Littafin Wakoki(+Tunes)"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

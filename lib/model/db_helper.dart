@@ -62,25 +62,6 @@ class DatabaseHelper {
     return result!.toList();
   }
 
-  /* Future<List> getFavHymns() async {
-    var dbClient = db;
-   int? result;
-    await dbClient.transaction((txn) async {
-      result = await txn
-          .rawQuery("SELECT * FROM $hymnTable WHERE $col_favorite == 1");
-    });
-    return result.toList();
-  }
-
-  Future<int> getCount() async {
-    var dbClient = db;
-    var count;
-    await dbClient.transaction((txn) async {
-      count = await txn.rawQuery("SELECT COUNT(*) FROM $hymnTable");
-    });
-    return Sqflite.firstIntValue(count);
-  }*/
-
   Future<ComposeHymns?> getHymns(int id) async {
     Database? dbClient = db;
     List? result;

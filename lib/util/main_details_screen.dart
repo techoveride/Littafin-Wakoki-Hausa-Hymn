@@ -49,7 +49,7 @@ class _MasterDetailsScreenState extends State<MasterDetailsScreen>
         TabController(vsync: this, length: _kTabs.length, initialIndex: 0);
 
     // TODO make sure to comment out this line before release
-    // startAppSdk.setTestAdsEnabled(true);
+    startAppSdk.setTestAdsEnabled(true);
     loadBanner();
     loadInterstitial();
     Future.delayed(const Duration(seconds: 5), () {
